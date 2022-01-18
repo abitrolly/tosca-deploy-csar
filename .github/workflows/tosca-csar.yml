@@ -15,11 +15,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: ./01install-xopera.sh
+      - name: Validate
+        run: opera validate SugarCRM-Interop-20130803.zip
       - name: Deploy
-        run: |
-          set +x
-          opera validate SugarCRM-Interop-20130803.zip
-          opera deploy SugarCRM-Interop-20130803.zip
+        # run this step even if previous steps failed
+        if: !cancelled()
+        run: opera deploy SugarCRM-Interop-20130803.zip
       - name: Test
         run: |
           curl -s http://localhost
