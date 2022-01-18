@@ -25,6 +25,12 @@ $ opera validate SugarCRM-Interop-20130803-patched/
 Validating CSAR...
 TOSCA-Metadata/TOSCA.meta: CSAR-Version 1.0 is not supported. Supported versions: {'1.1'}".
 ```
+ * [x] Bump `CSAR-Version` to 1.1 which looks compatible ([from another spec](http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.1/csprd01/TOSCA-Simple-Profile-YAML-v1.1-csprd01.html#_Toc464060446))
+```
+$ opera validate SugarCRM-Interop-20130803-patched/
+Validating CSAR...
+TOSCA-Metadata/TOSCA.meta: TOSCA-Meta-File-Version 1.0 is not supported. Supported versions: {'1.1'}".
+```
 4. Improvise
 5. Overcome
 6. Roadbump
