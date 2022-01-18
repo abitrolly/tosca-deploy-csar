@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions id="SugarCRM-InteropDefinitions"
+  name="SugarCRM-Interop Definitions"
+  targetNamespace="http://www.example.com/tosca/ServiceTemplates/SugarCRM-Interop"
+  xmlns="http://docs.oasis-open.org/tosca/ns/2011/12"
+  xmlns:ns1="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes"
+  xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes" xmlns:ns3="http://www.example.com/tosca/Types/SugarCRM">
+  <Import importType="http://docs.oasis-open.org/tosca/ns/2011/12"
+    location="TOSCA-v1.0-BaseTypes-Definitions.xml" namespace="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes"/>
+  <Import importType="http://www.w3.org/2001/XMLSchema"
+    location="../types/TOSCA-v1.0-BaseTypes.xsd" namespace="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes"/>
+  <Import importType="http://docs.oasis-open.org/tosca/ns/2011/12"
+    location="TOSCA-v1.0-SpecificTypes-Definitions.xml" namespace="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes"/>
+  <Import importType="http://www.w3.org/2001/XMLSchema"
+    location="../types/TOSCA-v1.0-SpecificTypes.xsd" namespace="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes"/>
+  <Import importType="http://docs.oasis-open.org/tosca/ns/2011/12"
+    location="SugarCRMTypes-Definitions.xml" namespace="http://www.example.com/tosca/Types/SugarCRM"/>
+  <Import importType="http://www.w3.org/2001/XMLSchema"
+    location="../types/SugarCRMTypes.xsd" namespace="http://www.example.com/tosca/Types/SugarCRM"/>
+  <ServiceTemplate id="SugarCRM-Interop" name="SugarCRM-Interop Template">
+    <TopologyTemplate>
+      <NodeTemplate id="WebTier" name="Web Tier" type="ns1:Tier">
+        <Capabilities>
+          <Capability id="WebTier_nodes" name="nodes" type="ns1:ServerContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <NodeTemplate id="VmApache" name="VM for Apache" type="ns1:Server">
+        <Properties>
+          <ns1:ServerProperties
+            xmlns:ns1="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+            <NumCpus>1</NumCpus>
+            <Memory>1024</Memory>
+          </ns1:ServerProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="VmApache_container" name="container" type="ns1:ServerContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="VmApache_os" name="os" type="ns1:OperatingSystemContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="VmApache_HostedOn_WebTier"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="VmApache_container"/>
+        <TargetElement ref="WebTier_nodes"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="OsApache" name="OS for Apache" type="ns1:OperatingSystem">
+        <Requirements>
+          <Requirement id="OsApache_container" name="container" type="ns1:OperatingSystemContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="OsApache_software" name="software" type="ns1:SoftwareContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="OsApache_HostedOn_VmApache"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="OsApache_container"/>
+        <TargetElement ref="VmApache_os"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="ApacheWebServer" name="Apache Web Server" type="ns2:ApacheWebServer">
+        <Properties>
+          <ns2:ApacheWebServerProperties
+            xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes">
+            <httpdport>80</httpdport>
+          </ns2:ApacheWebServerProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="ApacheWebServer_container" name="container" type="ns1:SoftwareContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="ApacheWebServer_webapps" name="webapps" type="ns2:ApacheWebApplicationContainerCapability"/>
+          <Capability id="ApacheWebServer_modules" name="modules" type="ns2:ApacheModuleContainerCapability"/>
+          <Capability id="ApacheWebServer_clients" name="clients" type="ns1:HTTPEndpointCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="Apache_HostedOn_OsApache"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="ApacheWebServer_container"/>
+        <TargetElement ref="OsApache_software"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="PhpModule" name="PHP Module" type="ns2:ApachePHPModule">
+        <Requirements>
+          <Requirement id="PhpModule_container" name="container" type="ns2:ApacheModuleContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="PhpModule_phpApps" name="phpApps" type="ns2:PHPRuntimeCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="PhpModule_HostedOn_Apache"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="PhpModule_container"/>
+        <TargetElement ref="ApacheWebServer_modules"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="SugarCrmApp" name="SugarCRM App" type="ns3:SugarCRMApplication">
+        <Properties>
+          <ns3:SugarCRMApplicationProperties
+            xmlns:ns3="http://www.example.com/tosca/Types/SugarCRM" xmlns="http://www.example.com/tosca/Types/SugarCRM">
+            <AdminUser>crmadmin</AdminUser>
+            <AdminPassword>crm123</AdminPassword>
+            <SiteName>My CRM</SiteName>
+            <SitePath>sugarcrm</SitePath>
+          </ns3:SugarCRMApplicationProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="SugarCrmApp_phpRuntime" name="phpRuntime" type="ns2:PHPRuntimeRequirement"/>
+          <Requirement id="SugarCrmApp_database" name="database" type="ns3:SugarCRMDatabaseEndpointRequirement"/>
+          <Requirement id="SugarCrmApp_container" name="container" type="ns2:ApacheWebApplicationContainerRequirement"/>
+        </Requirements>
+      </NodeTemplate>
+      <RelationshipTemplate id="SugarCrmApp_HostedOn_Apache"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="SugarCrmApp_container"/>
+        <TargetElement ref="ApacheWebServer_webapps"/>
+      </RelationshipTemplate>
+      <RelationshipTemplate id="SugarCrmApp_DependsOn_PhpModule"
+        name="depends on" type="ns1:DependsOn">
+        <SourceElement ref="SugarCrmApp_phpRuntime"/>
+        <TargetElement ref="PhpModule_phpApps"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="DatabaseTier" name="Database Tier" type="ns1:Tier">
+        <Capabilities>
+          <Capability id="DatabaseTier_nodes" name="nodes" type="ns1:ServerContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <NodeTemplate id="VmMySql" name="VM for MySQL" type="ns1:Server">
+        <Properties>
+          <ns1:ServerProperties
+            xmlns:ns1="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+            <NumCpus>1</NumCpus>
+            <Memory>1024</Memory>
+          </ns1:ServerProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="VmMySql_container" name="container" type="ns1:ServerContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="VmMySql_os" name="os" type="ns1:OperatingSystemContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="VmMySQL_HostedOn_DatabaseTier"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="VmMySql_container"/>
+        <TargetElement ref="DatabaseTier_nodes"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="OsMySQL" name="OS for MySQL" type="ns1:OperatingSystem">
+        <Requirements>
+          <Requirement id="OsMySQL_container" name="container" type="ns1:OperatingSystemContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="OsMySQL_software" name="software" type="ns1:SoftwareContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="OsMySQL_HostedOn_VmMySQL"
+        name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="OsMySQL_container"/>
+        <TargetElement ref="VmMySql_os"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="MySql" name="MySQL" type="ns2:MySQL">
+        <Properties>
+          <ns2:MySQLProperties
+            xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes">
+            <RootPassword>password</RootPassword>
+          </ns2:MySQLProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="MySql_container" name="container" type="ns1:SoftwareContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="MySql_databases" name="databases" type="ns2:MySQLDatabaseContainerCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="MySqlHostedOnOsMySQL" name="hosted on" type="ns1:HostedOn">
+        <SourceElement ref="MySql_container"/>
+        <TargetElement ref="OsMySQL_software"/>
+      </RelationshipTemplate>
+      <NodeTemplate id="SugarCrmDb" name="SugarCRM DB" type="ns3:SugarCRMDatabase">
+        <Properties>
+          <ns3:SugarCRMDatabaseProperties
+            xmlns:ns3="http://www.example.com/tosca/Types/SugarCRM" xmlns="http://www.example.com/tosca/Types/SugarCRM">
+            <DBName>crmdb</DBName>
+            <DBUser>crmadmin</DBUser>
+            <DBPassword>crmadmin</DBPassword>
+            <DBPort>3306</DBPort>
+          </ns3:SugarCRMDatabaseProperties>
+        </Properties>
+        <Requirements>
+          <Requirement id="SugarCrmDb_container" name="container" type="ns2:MySQLDatabaseContainerRequirement"/>
+        </Requirements>
+        <Capabilities>
+          <Capability id="SugarCrmDb_clients" name="clients" type="ns2:MySQLDatabaseEndpointCapability"/>
+        </Capabilities>
+      </NodeTemplate>
+      <RelationshipTemplate id="SugarCrmDb_HostedOn_MySql"
+        name="hosted on" type="ns2:MySQLDatabaseHostedOnMySQL">
+        <SourceElement ref="SugarCrmDb_container"/>
+        <TargetElement ref="MySql_databases"/>
+      </RelationshipTemplate>
+      <RelationshipTemplate id="SugarCrmApp_ConnectsTo_SugarCrmDb"
+        name="connects to" type="ns3:SugarCRMDatabaseConnection">
+        <SourceElement ref="SugarCrmApp_database"/>
+        <TargetElement ref="SugarCrmDb_clients"/>
+      </RelationshipTemplate>
+    </TopologyTemplate>
+  </ServiceTemplate>
+</Definitions>

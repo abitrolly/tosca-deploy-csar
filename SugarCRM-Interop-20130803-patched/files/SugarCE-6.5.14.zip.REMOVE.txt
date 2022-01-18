@@ -1,0 +1,3 @@
+The SugarCRM Community Edition installable has been removed.
+Please obtain the file SugarCE-6.5.14.zip from the SugarCRM website and
+place it into the files directory.

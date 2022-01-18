@@ -16,11 +16,11 @@ jobs:
       - name: Install dependencies
         run: ./01install-xopera.sh
       - name: Validate
-        run: opera validate SugarCRM-Interop-20130803.zip
+        run: opera validate SugarCRM-Interop-20130803-patched/
       - name: Deploy
         # run this step even if previous steps failed
         if: ${{ !cancelled() }}
-        run: opera deploy SugarCRM-Interop-20130803.zip
+        run: opera deploy SugarCRM-Interop-20130803-patched/
       - name: Test
         run: |
           curl -s http://localhost

@@ -8,8 +8,15 @@
 2. Download example CSAR [`SugarCRM-Interop-20130803.zip`](https://www.oasis-open.org/committees/document.php?document_id=50158) (included in this repo)
 3. Try to deploy it with xOpera and watch it fail
 ```
-opera validate SugarCRM-Interop-20130803.zip
-opera deploy SugarCRM-Interop-20130803.zip
+$ opera validate SugarCRM-Interop-20130803.zip
+Validating CSAR...
+TOSCA-Metadata/TOSCA.meta: Missing required meta entry: TOSCA-Meta-File-Version
+$ opera deploy SugarCRM-Interop-20130803.zip
+TOSCA-Metadata/TOSCA.meta: Missing required meta entry: TOSCA-Meta-File-Version
+```
+3. Unpack CSAR into `SugarCRM-Interop-20130803-patched/` dir and use it with xOpera
+```
+unzip SugarCRM-Interop-20130803.zip -d SugarCRM-Interop-20130803-patched
 ```
 3. Adapt
 4. Improvise

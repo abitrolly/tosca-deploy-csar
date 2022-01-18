@@ -1,0 +1,15 @@
+TOSCA-Meta-Version: 1.0
+CSAR-Version: 1.0
+Created-By: OASIS TOSCA Interop. SC
+
+Name: Definitions/TOSCA-v1.0-BaseTypes-Definitions.xml
+Content-Type: application/vnd.oasis.tosca.definitions
+
+Name: Definitions/TOSCA-v1.0-SpecificTypes-Definitions.xml
+Content-Type: application/vnd.oasis.tosca.definitions
+
+Name: Definitions/SugarCRMTypes-Definitions.xml
+Content-Type: application/vnd.oasis.tosca.definitions
+
+Name: Definitions/SugarCRM-Interop-Definitions.xml
+Content-Type: application/vnd.oasis.tosca.definitions

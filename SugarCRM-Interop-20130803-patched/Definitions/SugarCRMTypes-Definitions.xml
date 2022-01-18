@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions id="SugarCRMTypes" name="SugarCRMTypes"
+  targetNamespace="http://www.example.com/tosca/Types/SugarCRM"
+  xmlns="http://docs.oasis-open.org/tosca/ns/2011/12"
+  xmlns:ns1="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes"
+  xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns:tns="http://www.example.com/tosca/Types/SugarCRM">
+  <Import importType="http://docs.oasis-open.org/tosca/ns/2011/12"
+    location="TOSCA-v1.0-SpecificTypes-Definitions.xml" namespace="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaSpecificTypes"/>
+  <Import importType="http://www.w3.org/2001/XMLSchema"
+    location="../types/SugarCRMTypes.xsd" namespace="http://www.example.com/tosca/Types/SugarCRM"/>
+  <RequirementType name="SugarCRMDatabaseEndpointRequirement" requiredCapabilityType="ns1:MySQLDatabaseEndpointCapability">
+    <documentation>SugarCRM Database Endpoint Requirement</documentation>
+    <DerivedFrom typeRef="ns1:MySQLDatabaseEndpointRequirement"/>
+  </RequirementType>
+  <RelationshipType name="SugarCRMDatabaseConnection">
+    <documentation>Connects on</documentation>
+    <DerivedFrom typeRef="ns1:MySQLDatabaseConnection"/>
+    <SourceInterfaces>
+      <Interface name="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/RelationshipType/Source">
+        <Operation name="preConfigureEndpoint"/>
+      </Interface>
+    </SourceInterfaces>
+    <ValidSource typeRef="tns:SugarCRMDatabaseEndpointRequirement"/>
+    <ValidTarget typeRef="ns1:MySQLDatabaseEndpointCapability"/>
+  </RelationshipType>
+  <ArtifactTemplate
+    id="at-SugarCRMDatabaseConnection-Source-preConfigureEndpoint" type="ns2:ScriptArtifact">
+    <Properties>
+      <ns2:ScriptArtifactProperties
+        xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+        <ScriptLanguage>sh</ScriptLanguage>
+        <PrimaryScript>scripts/SugarCRMDatabaseConnection/configureDatabaseEndpoint.sh</PrimaryScript>
+      </ns2:ScriptArtifactProperties>
+    </Properties>
+    <ArtifactReferences>
+      <ArtifactReference reference="scripts/SugarCRMDatabaseConnection">
+        <Include pattern="configureDatabaseEndpoint.sh"/>
+      </ArtifactReference>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <RelationshipTypeImplementation
+    name="SugarCRMDatabaseConnectionImplementation" relationshipType="tns:SugarCRMDatabaseConnection">
+    <ImplementationArtifacts>
+      <ImplementationArtifact
+        artifactRef="tns:at-SugarCRMDatabaseConnection-Source-preConfigureEndpoint"
+        artifactType="ns2:ScriptArtifact"
+        interfaceName="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/RelationshipType/Source" operationName="preConfigureEndpoint"/>
+    </ImplementationArtifacts>
+  </RelationshipTypeImplementation>
+  <NodeType name="SugarCRMApplication">
+    <documentation>SugarCRM Application</documentation>
+    <DerivedFrom typeRef="ns1:ApacheWebApplication"/>
+    <PropertiesDefinition element="tns:SugarCRMApplicationProperties"/>
+    <RequirementDefinitions>
+      <RequirementDefinition lowerBound="1" name="phpRuntime"
+        requirementType="ns1:PHPRuntimeRequirement" upperBound="1"/>
+      <RequirementDefinition lowerBound="1" name="database"
+        requirementType="tns:SugarCRMDatabaseEndpointRequirement" upperBound="1"/>
+    </RequirementDefinitions>
+    <Interfaces>
+      <Interface name="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/lifecycle">
+        <Operation name="install"/>
+        <Operation name="configure"/>
+      </Interface>
+    </Interfaces>
+  </NodeType>
+  <ArtifactTemplate id="at-SugarCRMApplication-install" type="ns2:ScriptArtifact">
+    <Properties>
+      <ns2:ScriptArtifactProperties
+        xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+        <ScriptLanguage>sh</ScriptLanguage>
+        <PrimaryScript>scripts/SugarCRMApplication/install.sh</PrimaryScript>
+      </ns2:ScriptArtifactProperties>
+    </Properties>
+    <ArtifactReferences>
+      <ArtifactReference reference="scripts/SugarCRMApplication">
+        <Include pattern="install.sh"/>
+      </ArtifactReference>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <NodeTypeImplementation name="SugarCRMApplicationImplementation" nodeType="tns:SugarCRMApplication">
+    <ImplementationArtifacts>
+      <ImplementationArtifact
+        artifactRef="tns:at-SugarCRMApplication-install"
+        artifactType="ns2:ScriptArtifact"
+        interfaceName="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/lifecycle" operationName="install"/>
+      <ImplementationArtifact
+        artifactRef="tns:at-SugarCRMApplication-configure"
+        artifactType="ns2:ScriptArtifact"
+        interfaceName="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/lifecycle" operationName="configure"/>
+    </ImplementationArtifacts>
+    <DeploymentArtifacts>
+      <DeploymentArtifact
+        artifactRef="tns:at-SugarCRMApplication-SugarCrmApplication-archive"
+        artifactType="ns2:ArchiveArtifact" name="SugarCrmApplication-archive">
+        <ns2:ArchiveArtifactContextProperties
+          xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+          <ArchiveDeploymentInformation archiveReference="files/SugarCE-6.5.14.zip">
+            <ContentDeploymentLocation path="/tmp/tosca/artifacts/SugarCRMInstall"/>
+          </ArchiveDeploymentInformation>
+        </ns2:ArchiveArtifactContextProperties>
+      </DeploymentArtifact>
+      <DeploymentArtifact
+        artifactRef="tns:at-SugarCRMApplication-SugarCrmApplication-ConfigFiles"
+        artifactType="ns2:FileArtifact" name="SugarCrmApplication-ConfigFiles">
+        <ns2:FileArtifactContextProperties
+          xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+          <FileDeploymentInformation fileReference="files/config.php">
+            <DeploymentLocation path="/tmp/tosca/artifacts/config.php"/>
+          </FileDeploymentInformation>
+          <FileDeploymentInformation fileReference="files/config_override.php">
+            <DeploymentLocation path="/tmp/tosca/artifacts/config_override.php"/>
+          </FileDeploymentInformation>
+          <FileDeploymentInformation fileReference="files/.htaccess">
+            <DeploymentLocation path="/tmp/tosca/artifacts/.htaccess"/>
+          </FileDeploymentInformation>
+        </ns2:FileArtifactContextProperties>
+      </DeploymentArtifact>
+    </DeploymentArtifacts>
+  </NodeTypeImplementation>
+  <ArtifactTemplate id="at-SugarCRMApplication-configure" type="ns2:ScriptArtifact">
+    <Properties>
+      <ns2:ScriptArtifactProperties
+        xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+        <ScriptLanguage>sh</ScriptLanguage>
+        <PrimaryScript>scripts/SugarCRMApplication/configure.sh</PrimaryScript>
+      </ns2:ScriptArtifactProperties>
+    </Properties>
+    <ArtifactReferences>
+      <ArtifactReference reference="scripts/SugarCRMApplication">
+        <Include pattern="configure.sh"/>
+      </ArtifactReference>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <ArtifactTemplate
+    id="at-SugarCRMApplication-SugarCrmApplication-archive"
+    name="SugarCrmApplication-archive" type="ns2:ArchiveArtifact">
+    <Properties>
+      <ns2:ArchiveArtifactProperties
+        xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+        <ArchiveInformation archiveReference="files/SugarCE-6.5.14.zip" archiveType="zip"/>
+      </ns2:ArchiveArtifactProperties>
+    </Properties>
+    <ArtifactReferences>
+      <ArtifactReference reference="files/SugarCE-6.5.14.zip"/>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <ArtifactTemplate
+    id="at-SugarCRMApplication-SugarCrmApplication-ConfigFiles"
+    name="SugarCrmApplication-ConfigFiles" type="ns2:FileArtifact">
+    <ArtifactReferences>
+      <ArtifactReference reference="files/config.php"/>
+      <ArtifactReference reference="files/config_override.php"/>
+      <ArtifactReference reference="files/.htaccess"/>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <NodeType name="SugarCRMDatabase">
+    <documentation>SugarCRM Database</documentation>
+    <DerivedFrom typeRef="ns1:MySQLDatabase"/>
+    <PropertiesDefinition element="tns:SugarCRMDatabaseProperties"/>
+    <Interfaces>
+      <Interface name="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/lifecycle">
+        <Operation name="configure"/>
+      </Interface>
+    </Interfaces>
+  </NodeType>
+  <ArtifactTemplate id="at-SugarCRMDatabase-configure" type="ns2:ScriptArtifact">
+    <Properties>
+      <ns2:ScriptArtifactProperties
+        xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+        <ScriptLanguage>sh</ScriptLanguage>
+        <PrimaryScript>scripts/SugarCRMDatabase/configure.sh</PrimaryScript>
+      </ns2:ScriptArtifactProperties>
+    </Properties>
+    <ArtifactReferences>
+      <ArtifactReference reference="scripts/SugarCRMDatabase">
+        <Include pattern="configure.sh"/>
+      </ArtifactReference>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+  <NodeTypeImplementation name="SugarCRMDatabaseImplementation" nodeType="tns:SugarCRMDatabase">
+    <ImplementationArtifacts>
+      <ImplementationArtifact
+        artifactRef="tns:at-SugarCRMDatabase-configure"
+        artifactType="ns2:ScriptArtifact"
+        interfaceName="http://docs.oasis-open.org/tosca/ns/2011/12/interfaces/lifecycle" operationName="configure"/>
+    </ImplementationArtifacts>
+    <DeploymentArtifacts>
+      <DeploymentArtifact
+        artifactRef="tns:at-SugarCRMDatabase-SugarCrmDbContent-File"
+        artifactType="ns2:FileArtifact" name="SugarCrmDbContent-File">
+        <ns2:FileArtifactContextProperties
+          xmlns:ns2="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes">
+          <FileDeploymentInformation fileReference="files/SugarCRMDB.sql">
+            <DeploymentLocation path="/tmp/tosca/artifacts/SugarCRMDB.sql"/>
+          </FileDeploymentInformation>
+        </ns2:FileArtifactContextProperties>
+      </DeploymentArtifact>
+    </DeploymentArtifacts>
+  </NodeTypeImplementation>
+  <ArtifactTemplate id="at-SugarCRMDatabase-SugarCrmDbContent-File"
+    name="SugarCrmDbContent-File" type="ns2:FileArtifact">
+    <ArtifactReferences>
+      <ArtifactReference reference="files/SugarCRMDB.sql"/>
+    </ArtifactReferences>
+  </ArtifactTemplate>
+</Definitions>
