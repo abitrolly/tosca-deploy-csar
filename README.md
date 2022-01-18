@@ -31,17 +31,36 @@ $ opera validate SugarCRM-Interop-20130803-patched/
 Validating CSAR...
 TOSCA-Metadata/TOSCA.meta: TOSCA-Meta-File-Version 1.0 is not supported. Supported versions: {'1.1'}".
 ```
-4. Improvise
-5. Overcome
+ * [x] Bump `TOSCA-Meta-File-Version 1.0` to 1.1
+```
+opera validate SugarCRM-Interop-20130803-patched/
+Validating CSAR...
+Traceback (most recent call last):
+  File "/usr/local/bin/opera", line 8, in <module>
+    sys.exit(main())
+  File "/usr/local/lib/python3.9/dist-packages/opera/cli.py", line 61, in main
+    return args.func(args)
+  File "/usr/local/lib/python3.9/dist-packages/opera/commands/validate.py", line 61, in _parser_callback
+    validate_csar(csar_or_st_path, inputs, storage, args.verbose, args.executors)
+  File "/usr/local/lib/python3.9/dist-packages/opera/commands/validate.py", line 83, in validate_csar
+    entrypoint = csar.get_entrypoint()
+  File "/usr/local/lib/python3.9/dist-packages/opera/parser/tosca/csar.py", line 253, in get_entrypoint
+    return root_yamls[0]
+IndexError: list index out of range
+```
+
+**Conclusion: xOpera can not handle TOSCA 1.0 CSAR file**
+
+It needs to be (re)written to use YAML syntax.
+
 6. Roadbump
  * [ ] Find and add missing `SugarCE-6.5.14.zip` to the CSAR archive
- * [ ] Repeat `opera validate`
- * [ ] (probably) Rewrite TOSCA 1.0 XML into 1.3 YAML
+ * [ ] Rewrite TOSCA 1.0 XML into 1.3 YAML
  * [ ] Replace Bash scripts with Ansible playbooks
  * [ ] (probably) Adapt node definitions for xOpera
 7. [ ] Deploy CSAR to localhost
 ```
-`bash 02deploy.sh` to deploy hello app to localhost
+opera deploy
 ```
 8. [ ] Open http://locahost (probably) to see SugarCRM running
 
