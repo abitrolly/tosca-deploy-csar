@@ -19,7 +19,7 @@ jobs:
         run: opera validate SugarCRM-Interop-20130803.zip
       - name: Deploy
         # run this step even if previous steps failed
-        if: !cancelled()
+        if: ${{ !cancelled() }}
         run: opera deploy SugarCRM-Interop-20130803.zip
       - name: Test
         run: |
