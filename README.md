@@ -5,9 +5,8 @@
 ./01install-xopera.sh
 ```
 
-2. [ ] Get example CSAR from https://www.oasis-open.org/committees/document.php?document_id=50158
-       (`SugarCRM-Interop-20130803.zip` in this repo)
-3. [ ] Try to deploy `SugarCRM-Interop-20130803.zip` with xOpera and watch it fail
+2. Download example CSAR [`SugarCRM-Interop-20130803.zip`](https://www.oasis-open.org/committees/document.php?document_id=50158) (included in this repo)
+3. Try to deploy it with xOpera and watch it fail
 ```
 opera validate SugarCRM-Interop-20130803.zip
 opera deploy SugarCRM-Interop-20130803.zip
@@ -16,11 +15,11 @@ opera deploy SugarCRM-Interop-20130803.zip
 4. Improvise
 5. Overcome
 6. Roadbump
-   [ ] Find and add missing `SugarCE-6.5.14.zip` to the CSAR archive
-   [ ] Repeat `opera validate`
-   [ ] (probably) Rewrite TOSCA 1.0 XML into 1.3 YAML
-   [ ] Replace Bash scripts with Ansible playbooks
-   [ ] (probably) Adapt node definitions for xOpera
+ * [ ] Find and add missing `SugarCE-6.5.14.zip` to the CSAR archive
+ * [ ] Repeat `opera validate`
+ * [ ] (probably) Rewrite TOSCA 1.0 XML into 1.3 YAML
+ * [ ] Replace Bash scripts with Ansible playbooks
+ * [ ] (probably) Adapt node definitions for xOpera
 7. [ ] Deploy CSAR to localhost
 ```
 `bash 02deploy.sh` to deploy hello app to localhost

@@ -1,0 +1,25 @@
+name: Deploy TOSCA CSAR with Ansible
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    container: ubuntu:21.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: ./01install.sh
+      - name: Deploy
+        run: |
+          set +x
+          opera validate SugarCRM-Interop-20130803.zip
+          opera deploy SugarCRM-Interop-20130803.zip
+      - name: Test
+        run: |
+          curl -s http://localhost
