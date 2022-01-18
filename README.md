@@ -18,7 +18,13 @@ TOSCA-Metadata/TOSCA.meta: Missing required meta entry: TOSCA-Meta-File-Version
 ```
 unzip SugarCRM-Interop-20130803.zip -d SugarCRM-Interop-20130803-patched
 ```
-3. Adapt
+4. Fix invalid CSAR parts
+ * [x] Replaced invalid `TOSCA-Meta-Version` with `TOSCA-Meta-File-Version` ([see the spec](http://docs.oasis-open.org/tosca/TOSCA/v1.0/os/TOSCA-v1.0-os.html))
+```
+$ opera validate SugarCRM-Interop-20130803-patched/
+Validating CSAR...
+TOSCA-Metadata/TOSCA.meta: CSAR-Version 1.0 is not supported. Supported versions: {'1.1'}".
+```
 4. Improvise
 5. Overcome
 6. Roadbump
